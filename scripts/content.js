@@ -1,102 +1,115 @@
-document.addEventListener("scroll", buscarVideos)
-document.addEventListener("load", buscarVideos)
-buscarVideos()
 
-function buscarVideos() {
-	console.debug("buscarVídeos")
-	const isReels = window.location.pathname.includes("reels")
+let default_config = {
+	controls: true,
+	autoplay: false,
+	volume: 0.05,
+	muted: false,
+	autoScroll: false,
+}
 
-	console.log(isReels)
-	if (isReels) {
-		formatReels()
+
+let lastUrl
+
+checkView()
+
+setInterval(() => {
+	const currentUrl = window.location.pathname.split("/")[1]
+	if (currentUrl === lastUrl) return
+
+	lastUrl = currentUrl
+	checkView()
+
+}, 100)
+
+
+function checkView() {
+
+	if (lastUrl === "reels") {
+		handleReels()
 		return
 	}
-	const videos = document.querySelectorAll("video");
 
-
-	if (videos) {
-		videos.forEach(video => {
-
-			video.volume = 0.05
-			video.muted = false
-			video.controls = true
-
-			if (video.nextSibling) {
-				video.nextSibling.remove()
-			}
-
-		})
-
+	if (lastUrl === "p") {
+		handlePost()
+		return
 	}
+
+	handleFeed()
 }
 
-function formatReels() {
+function addControls(element, reels = { reels: false }) {
+	const elementsOnCenter = element.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+
+	elementsOnCenter.forEach(el => {
+		if (el.tagName !== "VIDEO") return
+		el.controls = default_config.controls
+		el.autoplay = default_config.autoplay
+		el.volume = default_config.volume
+		el.onplaying = () => {
+			el.muted = default_config.muted
+		}
+		if (el.nextSibling) {
+			el.nextSibling.remove()
+		}
+
+		if (reels.reels === true && default_config.autoScroll === true) {
+			el.onended = () => {
+				reels.container.scrollBy({
+					top: 400,
+					behavior: "smooth"
+				})
+			};
+
+		}
+
+	})
 
 
-	// document.querySelector("section > main > div").onscroll = () => console.log("teste")
+}
+
+function handlePost() {
+
+	const mainContainer = document.querySelector("body")
+
+
+	const observer = new MutationObserver(() => {
+		const el = document.querySelector("video")
+		if (!el) return
+		el.controls = default_config.controls
+		el.autoplay = default_config.autoplay
+		el.volume = default_config.volume
+		el.onplaying = () => {
+			el.muted = default_config.muted
+		}
+		if (el.nextSibling) {
+			el.nextSibling.remove()
+		}
+
+
+	})
+
+	observer.observe(mainContainer, {
+		childList: true
+	})
+}
+
+function handleFeed() {
+	document.onscroll = () => {
+		addControls(document)
+	}
+
+}
+
+
+
+function handleReels() {
+
 	const container = document.querySelector("section > main > div")
+
 	container.onscroll = () => {
-		const element = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
-		element.forEach(el => {
-			if (el.tagName === "VIDEO") {
-				el.nextSibling.remove()
-				el.controls = true
-				el.muted
-				el.volume = 0.05
-				el.muted = false
-				el.onplaying = () => {
-					el.muted = false
-				}
-				el.onended = () => {
-					container.scrollBy({
-						top: 400,
-						behavior: "smooth"
-					})
-				};
-			}
-		})
+		addControls(document, { reels: true, container: container })
 	}
-
-	// addControls()
-	//
-	// const observer = new MutationObserver(() => {
-	// 	addControls()
-	// 	console.log("callback that runs when observer is triggered");
-	// });
-	//
-	// observer.observe(container, {
-	// 	subtree: true,
-	// 	childList: true,
-
 
 }
 
-//
-// function addControls() {
-// 	console.log("addControls")
-// 	const videos = document.querySelectorAll("video")
-//
-// 	document.querySelectorAll("video ~ div").forEach(el => {
-// 		el.remove()
-// 	})
-//
-// 	// document.querySelectorAll("video ~ div > div > div > div > div > div").forEach(el => {
-// 	// 	el.remove()
-// 	// })
-// 	//
-// 	// document.querySelectorAll("video ~ div > div > div > div > div > div ~ div").forEach(el => {
-// 	// 	console.log(el)
-// 	// })
-// 	//
-//
-//
-// 	videos.forEach(video => {
-//
-// 		console.log(video.getBoundingClientRect())
-//
-// 		video.controls = true
-// 		video.volume = 0.05
-// 		video.muted = false
-// 	})
-//
-// }
+

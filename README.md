@@ -8,7 +8,7 @@ TODO:
   - [ ] Autoplay on/off
   - [ ] Loop/Pause at end 
 
-Known issues: 
+~Known issues:~  
+- ~First reels don't work :)~
+- ~Don't work on popped up posts~
 
-- First reels don't work :)
-- Don't work on popped up posts

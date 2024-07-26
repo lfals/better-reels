@@ -7,3 +7,7 @@ TODO:
   - [ ] Initial volume
   - [ ] Autoplay on/off
   - [ ] Loop/Pause at end 
+
+Known issues: 
+
+- First reels don't work :)

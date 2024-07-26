@@ -11,3 +11,4 @@ TODO:
 Known issues: 
 
 - First reels don't work :)
+- Don't work on popped up posts

@@ -3,7 +3,7 @@ let default_config = {
 	controls: true,
 	autoplay: false,
 	volume: 0.05,
-	muted: false,
+	muted: true,
 	autoScroll: false,
 }
 
@@ -44,6 +44,7 @@ function addControls(element, reels = { reels: false }) {
 		if (el.tagName !== "VIDEO") return
 		el.controls = default_config.controls
 		el.autoplay = default_config.autoplay
+		el.download = true
 		el.volume = default_config.volume
 		el.onplaying = () => {
 			el.muted = default_config.muted
@@ -80,6 +81,7 @@ function handlePost() {
 		el.volume = default_config.volume
 		el.onplaying = () => {
 			el.muted = default_config.muted
+			el.volume = default_config.volume
 		}
 		if (el.nextSibling) {
 			el.nextSibling.remove()
@@ -94,6 +96,9 @@ function handlePost() {
 }
 
 function handleFeed() {
+
+	addControls(document)
+
 	document.onscroll = () => {
 		addControls(document)
 	}
@@ -105,6 +110,18 @@ function handleFeed() {
 function handleReels() {
 
 	const container = document.querySelector("section > main > div")
+
+	const video = document.querySelector("section > main > div video")
+
+
+	if (video === null) {
+		setTimeout(() => {
+			handleReels()
+		}, 500)
+		return
+	}
+
+	addControls(document, { reels: true, container: container })
 
 	container.onscroll = () => {
 		addControls(document, { reels: true, container: container })

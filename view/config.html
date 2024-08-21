@@ -1,0 +1,43 @@
+<html>
+
+<body>
+	<p>
+		Change the settings to your taste
+	</p>
+	<div>
+		<fieldset>
+			<label>Autoplay</label>
+			<input id="autoplay" type="checkbox" aria-label="autoplay" />
+		</fieldset>
+		<fieldset>
+			<label>Default Volume</label>
+			<input id="volume" type="range" />
+		</fieldset>
+		<fieldset>
+			<label>
+				Muted on scroll
+			</label>
+			<input id="muted" type="checkbox" aria-label="muted on scroll" />
+		</fieldset>
+		<fieldset>
+			<label>
+				Autoscroll
+			</label>
+			<input id="autoscroll" type="checkbox" aria-label="autoscroll" />
+		</fieldset>
+		<div id="status"></div>
+		<button type="button" id="save">Save </button>
+	</div>
+	<style>
+		body {
+			width: 300px;
+		}
+
+		fieldset {
+			border: none;
+		}
+	</style>
+	<script src="config.js"></script>
+</body>
+
+</html>

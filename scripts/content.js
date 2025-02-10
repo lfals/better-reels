@@ -3,7 +3,7 @@ let default_config = {
 	controls: true,
 	autoplay: false,
 	volume: 0.05,
-	muted: true,
+	muted: false, 
 	autoScroll: false,
 }
 
@@ -47,7 +47,9 @@ function addControls(element, reels = { reels: false }) {
 		el.download = true
 		el.volume = default_config.volume
 		el.onplaying = () => {
+			setTimeout(() => {
 			el.muted = default_config.muted
+			}, 100)
 		}
 		if (el.nextSibling) {
 			el.nextSibling.remove()
@@ -80,8 +82,11 @@ function handlePost() {
 		el.autoplay = default_config.autoplay
 		el.volume = default_config.volume
 		el.onplaying = () => {
-			el.muted = default_config.muted
+		setTimeout(() => {
+		el.muted = default_config.muted
 			el.volume = default_config.volume
+		}, 100)
+
 		}
 		if (el.nextSibling) {
 			el.nextSibling.remove()

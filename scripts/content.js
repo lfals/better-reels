@@ -1,137 +1,126 @@
+let ticking = false;
+let lastVideoElement
+let currentUrl
+let currentUrlSplit
 
-let default_config = {
-	controls: true,
-	autoplay: false,
-	volume: 0.05,
-	muted: false, 
-	autoScroll: false,
+function checkUrl() {
+	const newUrl = window.location.href
+	if (newUrl !== currentUrl) {
+		currentUrl = newUrl
+		currentUrlSplit = currentUrl.split("/")[3]
+		console.log({ currentUrlSplit })
+		main()
+	}
 }
 
-
-let lastUrl
-
-checkView()
-
 setInterval(() => {
-	const currentUrl = window.location.pathname.split("/")[1]
-	if (currentUrl === lastUrl) return
-
-	lastUrl = currentUrl
-	checkView()
-
+	checkUrl()
 }, 100)
 
 
-function checkView() {
+function main() {
 
-	if (lastUrl === "reels") {
-		handleReels()
-		return
-	}
+	if (currentUrlSplit === "reels") {
 
-	if (lastUrl === "p") {
-		handlePost()
-		return
-	}
+		const elementsOnCenter = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+		const videoElement = elementsOnCenter.find((element) => {
+			return element.tagName === "VIDEO"
+		})
 
-	handleFeed()
-}
-
-function addControls(element, reels = { reels: false }) {
-	const elementsOnCenter = element.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
-
-	elementsOnCenter.forEach(el => {
-		if (el.tagName !== "VIDEO") return
-		el.controls = default_config.controls
-		el.autoplay = default_config.autoplay
-		el.download = true
-		el.volume = default_config.volume
-		el.onplaying = () => {
-			setTimeout(() => {
-			el.muted = default_config.muted
-			}, 100)
-		}
-		if (el.nextSibling) {
-			el.nextSibling.remove()
-		}
-
-		if (reels.reels === true && default_config.autoScroll === true) {
-			el.onended = () => {
-				reels.container.scrollBy({
-					top: 400,
-					behavior: "smooth"
-				})
-			};
+		if (videoElement) {
+			lastVideoElement = videoElement
+			videoElement.volume = 0.05
+			videoElement.muted = false
 
 		}
 
-	})
+		const reelsScroll = document.querySelector("section > main > div")
+		reelsScroll.addEventListener("scrollend", (e) => {
+
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					if (lastVideoElement) {
+						lastVideoElement.style.border = "none"
+					}
+
+					const elementsOnCenter = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+
+					const videoElement = elementsOnCenter.find((element) => {
+						return element.tagName === "VIDEO"
+					})
+
+					if (videoElement) {
+						lastVideoElement = videoElement
+						videoElement.volume = 0.05
+						videoElement.muted = false
+						const muteButton = videoElement.nextElementSibling.children[0].children[0].children[0].children[0].children[0].children[0]
+
+					}
 
 
-}
+					ticking = false;
+				});
 
-function handlePost() {
+				ticking = true;
+			}
 
-	const mainContainer = document.querySelector("body")
+		})
+	}
 
+	if (currentUrlSplit === "") {
+		const elementsOnCenter = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+		const videoElement = elementsOnCenter.find((element) => {
+			return element.tagName === "VIDEO"
+		})
 
-	const observer = new MutationObserver(() => {
-		const el = document.querySelector("video")
-		if (!el) return
-		el.controls = default_config.controls
-		el.autoplay = default_config.autoplay
-		el.volume = default_config.volume
-		el.onplaying = () => {
-		setTimeout(() => {
-		el.muted = default_config.muted
-			el.volume = default_config.volume
-		}, 100)
+		if (videoElement) {
+			lastVideoElement = videoElement
+			videoElement.volume = 0.05
+			videoElement.muted = false
 
 		}
-		if (el.nextSibling) {
-			el.nextSibling.remove()
+
+		const reelsScroll = document.querySelector("#mount_0_0_UT")
+		reelsScroll.addEventListener("scroll", (e) => {
+			console.log("scroll")
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					if (lastVideoElement) {
+						lastVideoElement.style.border = "none"
+					}
+
+					const elementsOnCenter = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+
+					const videoElement = elementsOnCenter.find((element) => {
+						return element.tagName === "VIDEO"
+					})
+
+					console.log({ videoElement })
+					if (videoElement) {
+						lastVideoElement = videoElement
+						videoElement.volume = 0.05
+						videoElement.muted = false
+						const muteButton = videoElement.nextElementSibling.children[0].children[0].children[0].children[0].children[0].children[0]
+
+					}
+
+
+					ticking = false;
+				});
+
+				ticking = true;
+			}
+		})
+	}
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.type === "setVolume") {
+		if (lastVideoElement) {
+			lastVideoElement.volume = request.volume / 100
 		}
-
-
-	})
-
-	observer.observe(mainContainer, {
-		childList: true
-	})
-}
-
-function handleFeed() {
-
-	addControls(document)
-
-	document.onscroll = () => {
-		addControls(document)
+	} else if (request.type === "getVolume") {
+		sendResponse(lastVideoElement ? lastVideoElement.volume : 0.05)
 	}
-
 }
-
-
-
-function handleReels() {
-
-	const container = document.querySelector("section > main > div")
-
-	const video = document.querySelector("section > main > div video")
-
-
-	if (video === null) {
-		setTimeout(() => {
-			handleReels()
-		}, 500)
-		return
-	}
-
-	addControls(document, { reels: true, container: container })
-
-	container.onscroll = () => {
-		addControls(document, { reels: true, container: container })
-	}
-
-}
-
-
+)

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Better Reels",
-  "description": "Chrome extension for handling video/audio controls in instagram reels", 
+  "description": "Chrome extension for handling video/audio controls in instagram reels",
   "version": "0.0.5",
   "icons": {
     "16": "images/icon-16.png",
@@ -9,12 +9,20 @@
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
   },
-"content_scripts": [
+  "action": {
+    "default_popup": "config.html"
+  },
+  "permissions": [
+    "storage","tabs"
+  ],
+  "content_scripts": [
     {
-      "js": ["scripts/content.js"],
+      "js": [
+        "scripts/content.js"
+      ],
       "matches": [
-		"https://www.instagram.com/*",
-		  "https://www.instagram.com/reels/*"
+        "https://www.instagram.com/*",
+        "https://www.instagram.com/reels/*"
       ]
     }
   ]

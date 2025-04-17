@@ -13,7 +13,8 @@
     "default_popup": "config.html"
   },
   "permissions": [
-    "storage","tabs"
+    "storage",
+    "tabs"
   ],
   "content_scripts": [
     {

@@ -51,6 +51,14 @@ function updateVolumeSlider(volume) {
 	chrome.runtime.sendMessage({
 		type: "updateVolumeSlider",
 		volume: volumePercentage
+	}).catch(error => {
+		// Ignore the error when popup is not open
+		if (error.message.includes("Receiving end does not exist")) {
+			console.log("Popup is not open");
+			return;
+		}
+		// Re-throw other errors
+		throw error;
 	});
 }
 
@@ -72,6 +80,11 @@ function configureVideoElement(videoElement, container, videoContainer) {
 	videoElement.muted = false;
 	videoElement.setAttribute("controls", "true");
 
+	// Add loadedmetadata event listener to ensure video is unmuted when loaded
+	videoElement.addEventListener("loadedmetadata", () => {
+		videoElement.muted = false;
+	});
+
 	videoElement.addEventListener("volumechange", () => {
 		currentVolume = videoElement.volume || DEFAULT_VOLUME;
 		
@@ -83,6 +96,15 @@ function configureVideoElement(videoElement, container, videoContainer) {
 	});
 
 	videoElement.addEventListener("playing", () => {
+		console.log("Playing", { videoElement });
+
+		setTimeout(() => {
+			videoElement.muted = false;
+		}, 200);
+	});
+
+	// Add a play event listener to ensure video is unmuted when it starts playing
+	videoElement.addEventListener("play", () => {
 		videoElement.muted = false;
 	});
 

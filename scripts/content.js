@@ -70,6 +70,23 @@ function findVideoElementAtCenter() {
 }
 
 /**
+ * Updates the volume slider in the config page
+ * @param {number} volume - The volume value to set (0-1)
+ */
+function updateVolumeSlider(volume) {
+	return debugFunction('updateVolumeSlider', { volume }, () => {
+		// Convert volume to percentage (0-100)
+		const volumePercentage = Math.round(volume * 100);
+		
+		// Send message to update the volume slider in config.html
+		chrome.runtime.sendMessage({
+			type: "updateVolumeSlider",
+			volume: volumePercentage
+		});
+	});
+}
+
+/**
  * Configures a video element with default settings and handles related UI elements
  * @param {HTMLVideoElement} videoElement - The video element to configure
  * @param {HTMLElement} container - The container element that holds the video and related UI
@@ -94,6 +111,17 @@ function configureVideoElement(videoElement, container, videoContainer) {
 		videoElement.muted = false; // Always unmute the video
 		videoElement.setAttribute("controls", "true");
 
+		// Add volume change event listener
+		videoElement.addEventListener("volumechange", () => {
+			// Update the current volume setting
+			currentVolume = videoElement.volume;
+			
+			// Update the volume slider in config.html
+			updateVolumeSlider(currentVolume);
+			
+			if (DEBUG) console.log(`Video volume changed to: ${currentVolume}`);
+		});
+
 		// If container is provided, handle related UI elements
 		if (container) {
 			// Get profile info and actions
@@ -114,7 +142,9 @@ function configureVideoElement(videoElement, container, videoContainer) {
 
 			}
 
-			videoElement.nextSibling.remove();
+			if (videoElement.nextSibling) {
+				videoElement.nextSibling.remove();
+			}
 		}
 	});
 }

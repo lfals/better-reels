@@ -12,6 +12,7 @@ let ticking = false;
 let lastVideoElement = null;
 let currentUrl = "";
 let currentUrlSplit = "";
+let currentVolume = DEFAULT_VOLUME; // Store the current volume setting
 
 /**
  * Debug utility function to log function entry, parameters, and return values
@@ -89,8 +90,8 @@ function configureVideoElement(videoElement, container, videoContainer) {
 
 		// Configure the video element
 		lastVideoElement = videoElement;
-		videoElement.volume = DEFAULT_VOLUME;
-		videoElement.muted = false;
+		videoElement.volume = currentVolume; // Use the current volume setting
+		videoElement.muted = false; // Always unmute the video
 		videoElement.setAttribute("controls", "true");
 
 		// If container is provided, handle related UI elements
@@ -302,12 +303,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	}
 
 	if (request.type === "setVolume") {
+		// Update the current volume setting
+		currentVolume = request.volume / 100;
+		
+		// Apply to the current video if it exists
 		if (lastVideoElement) {
-			lastVideoElement.volume = request.volume / 100;
-			if (DEBUG) console.log(`Volume set to: ${request.volume / 100}`);
+			lastVideoElement.volume = currentVolume;
+			lastVideoElement.muted = false; // Ensure it's unmuted
+			if (DEBUG) console.log(`Volume set to: ${currentVolume}`);
 		}
 	} else if (request.type === "getVolume") {
-		const volume = lastVideoElement ? lastVideoElement.volume : DEFAULT_VOLUME;
+		const volume = lastVideoElement ? lastVideoElement.volume : currentVolume;
 		if (DEBUG) console.log(`Volume returned: ${volume}`);
 		sendResponse(volume);
 	}

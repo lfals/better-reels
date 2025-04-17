@@ -197,7 +197,7 @@ function styleActionsContainer(actions) {
 		actions.style.width = "100%";
 		actions.style.justifyContent = "start";
 		actions.style.gap = "10px";
-		actions.style.alignItems = "center";
+		actions.style.alignItems = "start";
 		actions.style.margin = "0px";
 	});
 }
@@ -300,10 +300,8 @@ function styleVideoContainer(videoContainer) {
 	}, () => {
 		if (!videoContainer) return;
 
-		// const height = getViewportHeight() - 32 - 158;
-
-		// videoContainer.style.height = `${height}px`;
-		// videoContainer.setAttribute("style", `height: ${height}px;`);
+		videoContainer.style.marginLeft = "310px";
+	
 	});
 }
 

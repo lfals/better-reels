@@ -73,7 +73,7 @@ function configureVideoElement(videoElement, container, videoContainer) {
 	videoElement.setAttribute("controls", "true");
 
 	videoElement.addEventListener("volumechange", () => {
-		currentVolume = videoElement.volume;
+		currentVolume = videoElement.volume || DEFAULT_VOLUME;
 		
 		updateVolumeSlider(currentVolume);
 	});

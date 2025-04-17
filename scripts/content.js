@@ -11,7 +11,7 @@ let ticking = false;
 let lastVideoElement = null;
 let currentUrl = "";
 let currentUrlSplit = "";
-let currentVolume = DEFAULT_VOLUME; // Store the current volume setting
+let currentVolume = DEFAULT_VOLUME;
 
 /**
  * Checks if the URL has changed and updates the state accordingly
@@ -46,10 +46,8 @@ function findVideoElementAtCenter() {
  * @param {number} volume - The volume value to set (0-1)
  */
 function updateVolumeSlider(volume) {
-	// Convert volume to percentage (0-100)
 	const volumePercentage = Math.round(volume * 100);
 	
-	// Send message to update the volume slider in config.html
 	chrome.runtime.sendMessage({
 		type: "updateVolumeSlider",
 		volume: volumePercentage
@@ -65,55 +63,41 @@ function updateVolumeSlider(volume) {
 function configureVideoElement(videoElement, container, videoContainer) {
 	if (!videoElement) return;
 
-	// Reset previous video element styling if needed
 	if (lastVideoElement && lastVideoElement !== videoElement) {
 		lastVideoElement.style.border = "none";
 	}
 
-	// Configure the video element
 	lastVideoElement = videoElement;
-	videoElement.volume = currentVolume; // Use the current volume setting
-	videoElement.muted = false; // Always unmute the video
+	videoElement.volume = currentVolume;
+	videoElement.muted = false;
 	videoElement.setAttribute("controls", "true");
 
-	// Add volume change event listener
 	videoElement.addEventListener("volumechange", () => {
-		// Update the current volume setting
 		currentVolume = videoElement.volume;
 		
-		// Update the volume slider in config.html
 		updateVolumeSlider(currentVolume);
 	});
 
-	// Add ended event listener to ensure video stays unmuted when it loops
 	videoElement.addEventListener("ended", () => {
-		// Ensure video stays unmuted when it loops
 		videoElement.muted = false;
 	});
 
 	videoElement.addEventListener("playing", () => {
-		// Ensure video stays unmuted when it loops
 		videoElement.muted = false;
 	});
 
-	// If container is provided, handle related UI elements
 	if (container) {
-		// Get profile info and actions
 		const profileInfo = videoElement.nextSibling?.childNodes[0]?.children[0]?.children[0]?.children[0]?.children[1]?.children[0];
 		const actions = container.children[1];
 
 		if (profileInfo && actions) {
-			// Style elements
 			styleProfileInfo(profileInfo);
 			styleActionsContainer(actions);
 			styleVideoContainer(videoContainer);
 			styleContentContainer(container);
 			
-
-			// Create and append actions container
 			const actionsContainer = createActionsContainer(profileInfo, actions);
 			container.appendChild(actionsContainer);
-
 		}
 
 		if (videoElement.nextSibling) {
@@ -133,7 +117,6 @@ function styleProfileInfo(profileInfo) {
 	profileInfo.style.width = "100%";
 	profileInfo.style.margin = "0px";
 
-	// Style all child elements
 	Array.from(profileInfo.getElementsByTagName("*")).forEach(element => {
 		element.style.color = "black";
 	});
@@ -195,12 +178,10 @@ function handleReelsScrollEnd(event) {
 	if (ticking) return;
 
 	window.requestAnimationFrame(() => {
-		// Find elements at center
 		const elementsOnCenter = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2);
 
 		const videoContainer = elementsOnCenter[CONTAINER_INDEX];
 
-		// Get container and video elements
 		const container = elementsOnCenter[CONTAINER_INDEX];
 		const videoElement = findVideoElementAtCenter();
 
@@ -209,7 +190,6 @@ function handleReelsScrollEnd(event) {
 			return;
 		}
 
-		// Configure video element and handle UI
 		configureVideoElement(videoElement, container, videoContainer);
 
 		ticking = false;
@@ -242,35 +222,28 @@ function styleVideoContainer(videoContainer) {
 function main() {
 	if (currentUrlSplit !== REELS_PATH) return;
 
-	// Configure initial video element
 	const videoElement = findVideoElementAtCenter();
 	const elementsOnCenter = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2);
 	const container = elementsOnCenter[CONTAINER_INDEX];
 	const videoContainer = elementsOnCenter[VIDEO_CONTAINER_INDEX];
 
-
 	if (videoElement) {
 		configureVideoElement(videoElement, container, videoContainer);
-		
 	}
 
-	// Set up scroll event listener
 	const reelsScroll = document.querySelector("section > main > div");
 	if (reelsScroll) {
 		reelsScroll.addEventListener("scrollend", handleReelsScrollEnd);
 	}
 }
 
-// Set up message listener for volume control
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.type === "setVolume") {
-		// Update the current volume setting
 		currentVolume = request.volume / 100;
 		
-		// Apply to the current video if it exists
 		if (lastVideoElement) {
 			lastVideoElement.volume = currentVolume;
-			lastVideoElement.muted = false; // Ensure it's unmuted
+			lastVideoElement.muted = false;
 		}
 	} else if (request.type === "getVolume") {
 		const volume = lastVideoElement ? lastVideoElement.volume : currentVolume;

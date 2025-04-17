@@ -122,6 +122,19 @@ function configureVideoElement(videoElement, container, videoContainer) {
 			if (DEBUG) console.log(`Video volume changed to: ${currentVolume}`);
 		});
 
+		// Add ended event listener to ensure video stays unmuted when it loops
+		videoElement.addEventListener("ended", () => {
+			// Ensure video stays unmuted when it loops
+			videoElement.muted = false;
+			if (DEBUG) console.log("Video ended, ensuring it stays unmuted when it loops");
+		});
+
+		videoElement.addEventListener("playing", () => {
+			// Ensure video stays unmuted when it loops
+			videoElement.muted = false;
+			if (DEBUG) console.log("Video playing, ensuring it stays unmuted when it loops");
+		});
+
 		// If container is provided, handle related UI elements
 		if (container) {
 			// Get profile info and actions
